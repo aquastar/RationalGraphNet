@@ -6,7 +6,7 @@ Codes for the paper
 > Zhiqian Chen, Feng Chen, Rongjie Lai, Xuchao Zhang, and Chang-Tien Lu, Rational Neural Networks for Approximating Jump Discontinuities of Graph Convolution Operator, International Conference on Data Mining(ICDM), Singpore, 2018
 
 
-# Detailed Manual (under construction)
+# Instruction (under construction)
 required python package
 ```
 numpy tensorflow magenta.music pandas midi music21 
