@@ -9,7 +9,7 @@ Codes for the paper
 # Instruction (under construction)
 required python package
 ```
-numpy tensorflow magenta.music pandas midi music21 
+numpy torch 
 ```
 
 
