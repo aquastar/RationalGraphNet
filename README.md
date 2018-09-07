@@ -20,7 +20,6 @@ numpy tensorflow magenta.music pandas midi music21
   author    = {Zhiqian Chen and
                Feng Chen and
                Rongjie Lai and
-               Alexander Lerch and
                Xuchao Zhang and
                Chang{-}Tien Lu},
   title     = {Rational Neural Networks for Approximating Jump Discontinuities of Graph Convolution Operator},
