@@ -18,7 +18,7 @@ numpy tensorflow magenta.music pandas midi music21
 ```
 @article{ratgraphnet
   author    = {Zhiqian Chen and
-                Feng Chen and
+               Feng Chen and
                Rongjie Lai and
                Alexander Lerch and
                Xuchao Zhang and
