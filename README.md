@@ -1,5 +1,5 @@
 # Project Page
- [Go to Project Homepage](aquastar.github.com/RationalGraphNet)
+ [Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
  
  
 # Rational Neural Network for Graph node-level embeddings
