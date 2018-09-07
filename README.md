@@ -1,4 +1,4 @@
-# Rational Net for Graph node-level embeddings
+# Rational Neural Network for Graph node-level embeddings
 
 
 # Related papar
