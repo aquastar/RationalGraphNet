@@ -1,4 +1,4 @@
-under construction, will avaliable before ICDM 2018
+under construction, will avaliable after ICDM 2018
 
 # Project Page
  [Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
