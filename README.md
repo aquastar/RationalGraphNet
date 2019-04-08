@@ -4,9 +4,6 @@
 # Demo of Rational Net in spectral domain
 ![approximation by rational neural networks](demo.gif)
 
-# Project Page
-[Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
- 
 # Rational Neural Network for Graph Signal Prediction
 
 ## requirement
