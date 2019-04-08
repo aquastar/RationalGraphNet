@@ -1,9 +1,8 @@
- will avaliable at April 2019
- 
- ![approximation by rational neural networks](demo.gif)
+# Approximation demo in spectral domain
+![approximation by rational neural networks](demo.gif)
 
 # Project Page
- [Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
+[Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
  
  
 # Rational Neural Network for Graph node-level embeddings
