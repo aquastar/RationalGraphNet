@@ -1,4 +1,6 @@
-under construction, will avaliable after ICDM 2018
+ will avaliable at April 2019
+ 
+ ![approximation by rational neural networks](demo.gif)
 
 # Project Page
  [Go to Project Homepage](http://aquastar.github.com/RationalGraphNet)
