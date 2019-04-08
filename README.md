@@ -9,14 +9,17 @@
  
 # Rational Neural Network for Graph Signal Prediction
 
-## requirement
 
 ## Instruction (under construction)
-required python package
+install required python package
 ```
-numpy torch 
+pip install -r requirements.txt  
 ```
 
+run on a pre-processed dataset (original: [American Revolution](https://github.com/corybrunson/triadic), processed: [TSV file](http://konect.uni-koblenz.de/networks/brunson_revolution))
+```
+python remez_net.py  
+```
 
 # Related papar
 Codes for the paper 
