@@ -328,7 +328,9 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=10000)
     args = parser.parse_args()
 
+    ######################
     # gen synthetic data
+    ######################
     # opt = 5
     # x = np.linspace(0, 1, 500)
     # y = func(x, opt=opt)
@@ -336,7 +338,10 @@ if __name__ == '__main__':
     # rez = remez_net(args)
     # rez.train(x, y, opt)
 
-    # Load data
+
+    ######################
+    # load real world graph
+    ######################
     adj, features, labels, idx_train, idx_val, idx_test = gen_data()
 
     e, U = LA.eigh(adj.A)
