@@ -1,9 +1,10 @@
 import argparse
+import os
+import time
 
 import scipy.interpolate
 import torch.nn.functional as F
-from pylab import *
-from pylab import plot
+from pylab import plot, matplotlib, math, mean, std
 from sklearn.metrics import mean_squared_error
 from torch import optim, nn
 from torch.autograd import Variable
@@ -154,19 +155,12 @@ class remez_net(object):
         pass
 
     def plot_metric(self, x, y, outer, inner, xnodes, ynodes):
-        # calculate criterion and show performance
-        de = self.rat.weight_de.data.cpu().numpy()
-        nu = self.rat.weight_nu.data.cpu().numpy()
-        c = np.concatenate((nu, de), axis=1)[0]
-        y_plot = rational(x, c, self.m, self.n)
+        y_plot = extract_rational(self.rat, x)
 
         matplotlib.style.use('seaborn')
         plt.xticks(fontsize=30)
         plt.yticks(fontsize=30)
 
-        # current ref
-        # y_ref = rational(xnodes, c, self.m, self.n)
-        # plt.scatter(xnodes, y_ref)
         plot(x, y_plot, markerfacecolor='salmon', markeredgewidth=1, markevery=slice(40, len(y_plot), 70),
              linestyle=':', marker='o', color='crimson', linewidth=3, label='fit')  # fit result
         plot(x, y, markerfacecolor='lime', markeredgewidth=1, markevery=slice(30, len(y_plot), 70), linestyle='-.',
@@ -184,16 +178,11 @@ class remez_net(object):
         plt.savefig('{}_{}.png'.format(outer, inner))
         plt.close()
 
-        # pk.dump(x, open('x_{}.pk'.format(opt), 'wb'))
-        # pk.dump(y_plot, open('y_{}.pk'.format(opt), 'wb'))
-
-        # plt.scatter(xnodes, y_ref - ynodes)  # current ref
-        # plot(x, y_plot - y, label='err')  # err result
-        # plt.show()
-
         res = y_plot - y
-        print("res: {}/{}".format(np.max(np.abs(res)), np.min(np.abs(res))))
-        print(rat_func_str(nu, de))
+        print("res: {}/{}".format(np.max(np.abs(res)), np.min(np.abs(res))), end='\r')
+        de = self.rat.weight_de.data.cpu().numpy()
+        nu = self.rat.weight_nu.data.cpu().numpy()
+        print(rat_func_str(nu, de), end='\r')
 
         return res
 
@@ -255,8 +244,8 @@ class remez_net(object):
 
                 if _ % 100 == 0:
                     print("epoch: {} loss {:.4f} = {:.8f} + {:.8f} + {:.8f}, E:{}, res:{}".format(_, loss, loss1, loss2,
-                                                                                                  loss3,
-                                                                                                  self.E.item(), res))
+                                                                                                  loss3, self.E.item(),
+                                                                                                  res), end='\r')
                     self.plot_metric(x, y, _e, _, xnodes, ynodes)
 
                 self.optimizer.zero_grad()
@@ -269,9 +258,10 @@ class remez_net(object):
                 # check the diff between max / min of res convergence
                 break
             else:
-                print("repick the references")
+                print("randomly repick the references")
                 xnodes, ynodes = pick()
 
+                # strictly follow repick policy
                 # for i in range(self.zero_num - 1):
                 #     a = min(res[xyindex[i]:xyindex[i + 1] + 1])
                 #     b = max(res[xyindex[i]:xyindex[i + 1] + 1])
@@ -328,9 +318,7 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=10000)
     args = parser.parse_args()
 
-    ######################
     # gen synthetic data
-    ######################
     # opt = 5
     # x = np.linspace(0, 1, 500)
     # y = func(x, opt=opt)
@@ -338,10 +326,7 @@ if __name__ == '__main__':
     # rez = remez_net(args)
     # rez.train(x, y, opt)
 
-
-    ######################
-    # load real world graph
-    ######################
+    # Load data
     adj, features, labels, idx_train, idx_val, idx_test = gen_data()
 
     e, U = LA.eigh(adj.A)
@@ -353,11 +338,19 @@ if __name__ == '__main__':
     # savefig('target2approx.png')
     # exit()
 
-    e = e[idx_train]
-    y = y[idx_train].flatten()
-    idx_train = torch.LongTensor(idx_train)
-    idx_val = torch.LongTensor(idx_val)
-    idx_test = torch.LongTensor(idx_test)
+    e_train = e[idx_train]
+    y_train = y[idx_train].flatten()
 
     rez = remez_net(args)
-    rez.train(e, y)
+    rez.train(e_train, y_train)
+
+    y_pred = extract_rational(rez.rat, e[idx_test])
+
+    res = y_pred - y[idx_test]
+    print("=== Testing in spectral domain")
+    print(res)
+
+    print("=== Testing in vertex domain")
+    labels_pred = np.dot(extract_rational_lap(rez.rat, adj), features)
+    res = labels_pred - labels
+    print(res)

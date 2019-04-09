@@ -79,6 +79,34 @@ def gen_data():
     e, U = LA.eigh(norm_lap.A)
     features = np.ones((len(graph.nodes), 1))
 
+    # set sign function to e
+    # for _ in range(int(len(e) / 2)):
+    #     e[_] = 0
+
+    # set abs function to e
+    ge = abs(e - 1)
+
+    new_lap = np.dot(U, np.dot(np.diag(ge), np.transpose(U)))
+    labels = np.dot(new_lap, features)
+
+    # bipartite
+    # ori_labels = np.array([v['bipartite'] for k, v in graph._node.items()])
+    # g1 = labels.flatten()[list(map(bool, ori_labels))]
+    # g2 = labels.flatten()[~np.array(list(map(bool, ori_labels)))]
+
+    # plot for demo
+    # g1 = []
+    # g2 = []
+    # for id, v in enumerate(list(graph.node)):
+    #     if v > 200:
+    #         g1.append(labels[id])
+    #     else:
+    #         g2.append(labels[id])
+    #
+    # plt.hist(g1, density=True, bins=10)
+    # plt.hist(g2, density=True, bins=10)
+    # plt.show()
+
     train_rate = 0.7
     val_rate = 0.8
     test_rate = 1.0
@@ -90,7 +118,14 @@ def gen_data():
     idx_val = sorted(data_ind[range(int(data_num * train_rate), int(data_num * val_rate))])
     idx_test = sorted(data_ind[range(int(data_num * val_rate), int(data_num * test_rate))])
 
-    labels = pk.load(open('labels.pk', 'rb'))
+    # idx_train = torch.LongTensor(train_num)
+    # idx_val = torch.LongTensor(val_num)
+    # idx_test = torch.LongTensor(test_num)
+
+    # features = torch.FloatTensor(features)
+    # labels = torch.FloatTensor(labels)
+
+    pk.dump(labels, open('labels.pk', 'wb'))
 
     return norm_lap, features, labels, idx_train, idx_val, idx_test
 
@@ -117,6 +152,21 @@ def load_data(path="../data/cora/", dataset="cora"):
 
     # build symmetric adjacency matrix
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
+
+    # # custom feat/labels and test jump
+    # features = np.ones((idx_features_labels.shape[0], 1))
+    # G = nx.from_scipy_sparse_matrix(adj)
+    # norm_lap = nx.normalized_laplacian_matrix(G)
+    # e, U = LA.eigh(norm_lap.A)
+    # Ut = U.transpose()
+    #
+    # labels = U[:, 1:2]
+    # x = e
+    # y = np.divide(np.dot(Ut, U[:, 1:2]), np.dot(Ut, features))
+    #
+    # plt.scatter(x, y)
+    # plt.show()
+    # exit()
 
     features = normalize(features)
     adj = normalize(adj + sp.eye(adj.shape[0]))
@@ -303,21 +353,34 @@ def func(x, opt=5):
         return x ** 2
 
 
-def rational(x, c, m, n):
-    p = 0.0
-    sp = []
+def rational_lap(lap, c, m, n):
+    p = []
     for i in range(m + 1):
-        p = p + c[i] * (x ** i)
-        sp.append("{}x^{}".format(c[i], str(i)))
+        p.append(c[i] * (lap ** i))
 
-    q = 1.0
-    sq = []
+    q = [sp.eye(lap.shape[0])]
     for i in range(m + 1, n + m + 1):
-        q = q + c[i] * (x ** (i - m))
-        sq.append("{}x^{}".format(c[i], str(i - m)))
+        q.append(c[i] * (lap ** (i - m)))
 
-    print("({})/(1+{})".format("+".join(sp), "+".join(sq)))
-    return p / q
+    p_m, q_m = sum(p), np.linalg.pinv(np.sum(p).A)
+
+    return p_m.dot(q_m)
+
+
+def extract_rational(rat, x):
+    de = rat.weight_de.data.cpu().numpy()
+    nu = rat.weight_nu.data.cpu().numpy()
+    c = np.concatenate((nu, de), axis=1)[0]
+
+    return rational(x, c, rat.m_orders, rat.n_orders)
+
+
+def extract_rational_lap(rat, lap):
+    de = rat.weight_de.data.cpu().numpy()
+    nu = rat.weight_nu.data.cpu().numpy()
+    c = np.concatenate((nu, de), axis=1)[0]
+
+    return rational_lap(lap, c, rat.m_orders, rat.n_orders)
 
 
 def rat_func(x, outs_nu, outs_de):
