@@ -5,7 +5,6 @@ import networkx as nx
 import numpy as np
 import scipy.sparse as sp
 import torch
-from numpy import linalg as LA
 from scipy.sparse.linalg.eigen.arpack import eigsh
 
 
@@ -71,16 +70,25 @@ def chebyshev_polynomials(adj, k):
     return sparse_to_tuple(t_k)
 
 
-def gen_data():
-    graph = nx.read_edgelist('america_revo', nodetype=int, comments='%')
+def gen_data(opt='', data=2):
+    if data == 1:
+        graph = nx.read_edgelist('data/america_revo', nodetype=int, comments='%')
+    elif data == 2:
+        graph = nx.read_weighted_edgelist('data/lang_country', comments='%')
+    elif data == 3:
+        graph = nx.read_weighted_edgelist('data/crime', comments='%')
+
     data_num = len(graph.nodes)
 
     norm_lap = nx.normalized_laplacian_matrix(graph)
+    if opt == 'gcn':
+        norm_lap = normalize(nx.adjacency_matrix(graph) + sp.eye(nx.adjacency_matrix(graph).shape[0]))
+
     features = np.ones((len(graph.nodes), 1))
 
-    train_rate = 0.7
-    val_rate = 0.8
-    test_rate = 1.0
+    train_rate = 0.6
+    val_rate = 0.7
+    test_rate = 1.
 
     data_ind = np.arange(data_num)
     np.random.shuffle(data_ind)
@@ -89,7 +97,7 @@ def gen_data():
     idx_val = sorted(data_ind[range(int(data_num * train_rate), int(data_num * val_rate))])
     idx_test = sorted(data_ind[range(int(data_num * val_rate), int(data_num * test_rate))])
 
-    labels = pk.load(open('labels.pk', 'rb'))
+    labels = pk.load(open('data/{}_labels.pk'.format(data), 'rb'))
 
     return norm_lap, features, labels, idx_train, idx_val, idx_test
 

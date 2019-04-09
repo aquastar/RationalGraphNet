@@ -246,13 +246,13 @@ class remez_net(object):
                     print("epoch: {} loss {:.4f} = {:.8f} + {:.8f} + {:.8f}, E:{}, res:{}".format(_, loss, loss1, loss2,
                                                                                                   loss3, self.E.item(),
                                                                                                   res), end='\r')
-                    self.plot_metric(x, y, _e, _, xnodes, ynodes)
+                    # self.plot_metric(x, y, _e, _, xnodes, ynodes)
 
                 self.optimizer.zero_grad()
                 loss.backward()
                 self.optimizer.step()
 
-            res = self.plot_metric(x, y, _e, _, xnodes, ynodes)
+            # res = self.plot_metric(x, y, _e, _, xnodes, ynodes)
 
             if self.chk_stop_condition():
                 # check the diff between max / min of res convergence
@@ -351,11 +351,11 @@ if __name__ == '__main__':
 
     y_pred = extract_rational(rez.rat, e[idx_test])
 
-    res = y_pred - y[idx_test]
+    res = mean_squared_error(y_pred, y[idx_test])
     print("=== Testing in spectral domain")
-    print(mean(res))
+    print(res)
 
     print("=== Testing in vertex domain")
     labels_pred = np.dot(extract_rational_lap(rez.rat, adj), features)
-    res = labels_pred - labels
-    print(mean(res))
+    res = mean_squared_error(labels_pred , labels)
+    print(res)
