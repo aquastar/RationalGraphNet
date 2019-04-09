@@ -33,11 +33,12 @@ GCN configuration is also provided. To perform regression task and compare fairl
 python pygcn/train.py  
 ```
 MSE 
-|               | RationalNet   | GCN |
-| ------------- | ------------- | ------------- |
-| America Revolution  | 0.0236  | 1.3641  |
-| crime  | 0.26021 | 1.0605  |
-| language  |0.0329  | 0.3912  |
+
+|         | RationalNet           | GCN  |
+| ------------- |:-------------:| -----:|
+| America      | 0.0236 | 1.3641 |
+| crime      | 0.26021      |   1.0605 |
+| language | 0.0329      |    0.3912 |
 
 # Related papar
 Codes for the paper 
