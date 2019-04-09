@@ -2,8 +2,8 @@
 ![remez net](ratnet.png)
 
 # Demo of Rational Net in spectral domain
-**func**: the target function to approximate
-**fit**: rational function by nerual networks
+**func**: the target function to approximate  
+**fit**: rational function by nerual networks  
 ![approximation by rational neural networks](demo.gif)
 
 # Rational Neural Network for Graph Signal Prediction
