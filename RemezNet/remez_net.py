@@ -4,13 +4,13 @@ import time
 
 import scipy.interpolate
 import torch.nn.functional as F
-from pylab import plot, matplotlib, math, mean, std
+from pylab import plot, matplotlib, mean, std
 from sklearn.metrics import mean_squared_error
 from torch import optim, nn
 from torch.autograd import Variable
 from torch.nn.parameter import Parameter
 
-from utils import *
+from RemezNet.utils import *
 
 
 class osc_loss(nn.Module):
@@ -82,32 +82,6 @@ class rational_net(nn.Module):
         a[:, ::2] = 1
         a[:, 1::2] = -1
         self.weight_de = Parameter(torch.FloatTensor(a))
-
-        # a = [[720/117649, -36/343, 232/343, -15/7, 25/7, -3, 1]]
-        # b = [[1, -1, 1, -1, 1, -1, 1]]
-
-        # Ground truth
-        # self.weight_nu = Parameter(torch.FloatTensor(np.array(
-        #     [[4.99999778e-01, - 4.74122263e+00, 1.91124430e+01,
-        #       - 4.23571888e+01, 5.52049474e+01, - 4.08096792e+01, 1.35848690e+01]])))
-        #
-        # self.weight_de = Parameter(torch.FloatTensor(np.array([[
-        #     1.0, - 7.48465143e+00, 2.33253432e+01,
-        #     - 3.88944169e+01, 3.74874439e+01, - 2.16505504e+01, 7.20516856e+00]])))
-
-        # (0.48651161789894104x^0+-1.5099493265151978x^1+1.109924077987671x^2+-0.6512492895126343x^3+1.515868067741394x^4+-0.4229825437068939x^5+1.622999668121338x^6)
-        # /(1+-1.375675916671753x^1+0.7969802618026733x^2+0.020870914682745934x^3+2.3738303184509277x^4+0.1153063252568245x^5+1.4852185249328613x^6)
-
-        nn.init.xavier_normal_(self.weight_de)
-        nn.init.xavier_normal_(self.weight_nu)
-
-    def reset_parameters(self):
-        stdv = 1. / math.sqrt(self.weight_nu.size(1))
-
-        self.weight_nu.data.uniform_(-stdv, stdv)
-        self.weight_de.data.uniform_(-stdv, stdv)
-        if self.bias is not None:
-            self.bias.data.uniform_(-stdv, stdv)
 
     def forward(self, x):
         support = torch.squeeze(torch.mm(self.weight_nu, x))
@@ -332,16 +306,12 @@ if __name__ == '__main__':
     #####################
     # Load real world graph
     #####################
-    adj, features, labels, idx_train, idx_val, idx_test = gen_data()
+    adj, features, labels, idx_train, idx_val, idx_test = gen_data(data=2)
 
     e, U = LA.eigh(adj.A)
     x_hat = np.dot(U.T, features)
     y_hat = np.dot(U.T, labels)
     y = np.divide(y_hat, x_hat)
-
-    # plot(e[idx_train], y[idx_train])
-    # savefig('target2approx.png')
-    # exit()
 
     e_train = e[idx_train]
     y_train = y[idx_train].flatten()
@@ -357,5 +327,5 @@ if __name__ == '__main__':
 
     print("=== Testing in vertex domain")
     labels_pred = np.dot(extract_rational_lap(rez.rat, adj), features)
-    res = mean_squared_error(labels_pred , labels)
+    res = mean_squared_error(labels_pred, labels)
     print(res)

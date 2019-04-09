@@ -72,11 +72,11 @@ def chebyshev_polynomials(adj, k):
 
 def gen_data(opt='', data=2):
     if data == 1:
-        graph = nx.read_edgelist('data/america_revo', nodetype=int, comments='%')
+        graph = nx.read_edgelist('../data/america_revo', nodetype=int, comments='%')
     elif data == 2:
-        graph = nx.read_weighted_edgelist('data/lang_country', comments='%')
+        graph = nx.read_weighted_edgelist('../data/lang_country', comments='%')
     elif data == 3:
-        graph = nx.read_weighted_edgelist('data/crime', comments='%')
+        graph = nx.read_weighted_edgelist('../data/crime', comments='%')
 
     data_num = len(graph.nodes)
 
@@ -97,50 +97,9 @@ def gen_data(opt='', data=2):
     idx_val = sorted(data_ind[range(int(data_num * train_rate), int(data_num * val_rate))])
     idx_test = sorted(data_ind[range(int(data_num * val_rate), int(data_num * test_rate))])
 
-    labels = pk.load(open('data/{}_labels.pk'.format(data), 'rb'))
+    labels = pk.load(open('../data/{}_labels.pk'.format(data), 'rb'))
 
     return norm_lap, features, labels, idx_train, idx_val, idx_test
-
-
-def load_data(path="../data/cora/", dataset="cora"):
-    """Load citation network dataset (cora only for now)"""
-    print('Loading {} dataset...'.format(dataset))
-
-    idx_features_labels = np.genfromtxt("{}{}.content".format(path, dataset),
-                                        dtype=np.dtype(str))
-    features = sp.csr_matrix(idx_features_labels[:, 1:-1], dtype=np.float32)
-    labels = encode_onehot(idx_features_labels[:, -1])
-
-    # build graph
-    idx = np.array(idx_features_labels[:, 0], dtype=np.int32)
-    idx_map = {j: i for i, j in enumerate(idx)}
-    edges_unordered = np.genfromtxt("{}{}.cites".format(path, dataset),
-                                    dtype=np.int32)
-    edges = np.array(list(map(idx_map.get, edges_unordered.flatten())),
-                     dtype=np.int32).reshape(edges_unordered.shape)
-    adj = sp.coo_matrix((np.ones(edges.shape[0]), (edges[:, 0], edges[:, 1])),
-                        shape=(labels.shape[0], labels.shape[0]),
-                        dtype=np.float32)
-
-    # build symmetric adjacency matrix
-    adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-
-    features = normalize(features)
-    adj = normalize(adj + sp.eye(adj.shape[0]))
-
-    idx_train = range(140)
-    idx_val = range(200, 500)
-    idx_test = range(500, 1500)
-
-    features = torch.FloatTensor(np.array(features.todense()))
-    labels = torch.LongTensor(np.where(labels)[1])
-    adj = sparse_mx_to_torch_sparse_tensor(adj)
-
-    idx_train = torch.LongTensor(idx_train)
-    idx_val = torch.LongTensor(idx_val)
-    idx_test = torch.LongTensor(idx_test)
-
-    return adj, features, labels, idx_train, idx_val, idx_test
 
 
 def normalize(mx):
@@ -151,13 +110,6 @@ def normalize(mx):
     r_mat_inv = sp.diags(r_inv)
     mx = r_mat_inv.dot(mx)
     return mx
-
-
-def accuracy(output, labels, reg=False):
-    preds = output.max(1)[1].type_as(labels)
-    correct = preds.eq(labels).double()
-    correct = correct.sum()
-    return correct / len(labels)
 
 
 def sparse_mx_to_torch_sparse_tensor(sparse_mx):
@@ -213,14 +165,6 @@ def rat_func_str(outs_nu, outs_de):
     xq = "+".join(["{}x^{}".format(outs_de[i], str(i)) for i in range(q_len)])
 
     return "({})/({})".format(xp, xq)
-
-
-def poly_func(x, outs_nu):
-    p_len = len(outs_nu)
-    xp = [x ** i for i in range(p_len)]
-    px = np.dot(outs_nu, np.array(xp))
-
-    return px
 
 
 def poly_func_str(outs_nu):
@@ -338,41 +282,6 @@ def extract_rational_lap(rat, lap):
     c = np.concatenate((nu, de), axis=1)[0]
 
     return rational_lap(lap, c, rat.m_orders, rat.n_orders)
-
-
-def rat_func(x, outs_nu, outs_de):
-    p_len = len(outs_nu)
-    q_len = len(outs_de)
-    xp = [x ** i for i in range(p_len)]
-    xq = [x ** i for i in range(q_len)]
-    px = np.dot(outs_nu, np.array(xp))
-    qx = np.dot(outs_de, np.array(xq))
-
-    return px / qx
-
-
-def poly_func(x, outs_nu):
-    p_len = len(outs_nu)
-    xp = [x ** i for i in range(p_len)]
-    px = np.dot(outs_nu, np.array(xp))
-
-    return px
-
-
-def rat_func_str(outs_nu, outs_de):
-    p_len = len(outs_nu)
-    q_len = len(outs_de)
-    xp = "+".join(["{}x^{}".format(outs_nu[i], str(i)) for i in range(p_len)])
-    xq = "+".join(["{}x^{}".format(outs_de[i], str(i)) for i in range(q_len)])
-
-    return "({})/({})".format(xp, xq)
-
-
-def poly_func_str(outs_nu):
-    p_len = len(outs_nu)
-    xp = "+".join(["{}x^{}".format(outs_nu[i], str(i)) for i in range(p_len)])
-
-    return xp
 
 
 def print_network(net):

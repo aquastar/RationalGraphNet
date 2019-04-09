@@ -10,7 +10,7 @@ import torch.nn.functional as F
 import torch.optim as optim
 
 from pygcn.models import GCN
-from utils import gen_data, sparse_mx_to_torch_sparse_tensor
+from RemezNet.utils import gen_data, sparse_mx_to_torch_sparse_tensor
 
 # Training settings
 parser = argparse.ArgumentParser()
@@ -39,7 +39,7 @@ if args.cuda:
     torch.cuda.manual_seed(args.seed)
 
 # Load data
-adj, features, labels, idx_train, idx_val, idx_test = gen_data('')
+adj, features, labels, idx_train, idx_val, idx_test = gen_data(data=3)
 
 adj = sparse_mx_to_torch_sparse_tensor(adj)
 features = torch.FloatTensor(features)
@@ -74,7 +74,6 @@ def train(epoch):
     optimizer.zero_grad()
     output = model(features, adj)
     loss_train = F.mse_loss(output[idx_train], labels[idx_train])
-    acc_train = loss_train
     loss_train.backward()
     optimizer.step()
 
@@ -85,12 +84,9 @@ def train(epoch):
         output = model(features, adj)
 
     loss_val = F.mse_loss(output[idx_val], labels[idx_val])
-    acc_val = loss_val
     print('Epoch: {:04d}'.format(epoch + 1),
-          'loss_train: {:.4f}'.format(loss_train.item()),
-          'acc_train: {:.4f}'.format(acc_train.item()),
-          'loss_val: {:.4f}'.format(loss_val.item()),
-          'acc_val: {:.4f}'.format(acc_val.item()),
+          'mse_train: {:.4f}'.format(loss_train.item()),
+          'mse_val: {:.4f}'.format(loss_val.item()),
           'time: {:.4f}s'.format(time.time() - t))
 
 
@@ -98,10 +94,8 @@ def test():
     model.eval()
     output = model(features, adj)
     loss_test = F.mse_loss(output[idx_test], labels[idx_test])
-    acc_test = loss_test
     print("Test set results:",
-          "loss= {:.4f}".format(loss_test.item()),
-          "accuracy= {:.4f}".format(acc_test.item()))
+          "mse= {:.4f}".format(loss_test.item()))
 
 
 # Train model
