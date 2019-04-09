@@ -15,9 +15,22 @@ install required python package
 pip install -r requirements.txt  
 ```
 
-run on a pre-processed dataset (original: [American Revolution](https://github.com/corybrunson/triadic), processed: [TSV file](http://konect.uni-koblenz.de/networks/brunson_revolution))
+Choose on pre-processed datasets (Default is 1st below): 
+- [American Revolution (unweighted)](https://github.com/corybrunson/triadic), pre-processed: [TSV file](http://konect.uni-koblenz.de/networks/brunson_revolution))
+- [crime (unweighted)](http://konect.uni-koblenz.de/networks/moreno_crime), pre-processed:[TSV file](http://konect.uni-koblenz.de/networks/moreno_crime)
+- [language-country (weighted)](http://www.unicode.org/cldr/charts/25/supplemental/territory_language_information.html), pre-processed:[TSV file](http://konect.uni-koblenz.de/networks/unicodelang)
+
+data switch can be configured by pass dataset index in remez_net.py
+```python
+gen_data(data=1)
+```
+Then, run the main program:
 ```
 python remez_net.py  
+```
+GCN configuration is also provided. To perform regression task and compare fairly, neural network weights are removed:
+```
+python pygcn/train.py  
 ```
 
 # Related papar
