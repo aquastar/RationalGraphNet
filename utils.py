@@ -76,36 +76,7 @@ def gen_data():
     data_num = len(graph.nodes)
 
     norm_lap = nx.normalized_laplacian_matrix(graph)
-    e, U = LA.eigh(norm_lap.A)
     features = np.ones((len(graph.nodes), 1))
-
-    # set sign function to e
-    # for _ in range(int(len(e) / 2)):
-    #     e[_] = 0
-
-    # set abs function to e
-    ge = abs(e - 1)
-
-    new_lap = np.dot(U, np.dot(np.diag(ge), np.transpose(U)))
-    labels = np.dot(new_lap, features)
-
-    # bipartite
-    # ori_labels = np.array([v['bipartite'] for k, v in graph._node.items()])
-    # g1 = labels.flatten()[list(map(bool, ori_labels))]
-    # g2 = labels.flatten()[~np.array(list(map(bool, ori_labels)))]
-
-    # plot for demo
-    # g1 = []
-    # g2 = []
-    # for id, v in enumerate(list(graph.node)):
-    #     if v > 200:
-    #         g1.append(labels[id])
-    #     else:
-    #         g2.append(labels[id])
-    #
-    # plt.hist(g1, density=True, bins=10)
-    # plt.hist(g2, density=True, bins=10)
-    # plt.show()
 
     train_rate = 0.7
     val_rate = 0.8
@@ -118,14 +89,7 @@ def gen_data():
     idx_val = sorted(data_ind[range(int(data_num * train_rate), int(data_num * val_rate))])
     idx_test = sorted(data_ind[range(int(data_num * val_rate), int(data_num * test_rate))])
 
-    # idx_train = torch.LongTensor(train_num)
-    # idx_val = torch.LongTensor(val_num)
-    # idx_test = torch.LongTensor(test_num)
-
-    # features = torch.FloatTensor(features)
-    # labels = torch.FloatTensor(labels)
-
-    pk.dump(labels, open('labels.pk', 'wb'))
+    labels = pk.load(open('labels.pk', 'rb'))
 
     return norm_lap, features, labels, idx_train, idx_val, idx_test
 
@@ -152,21 +116,6 @@ def load_data(path="../data/cora/", dataset="cora"):
 
     # build symmetric adjacency matrix
     adj = adj + adj.T.multiply(adj.T > adj) - adj.multiply(adj.T > adj)
-
-    # # custom feat/labels and test jump
-    # features = np.ones((idx_features_labels.shape[0], 1))
-    # G = nx.from_scipy_sparse_matrix(adj)
-    # norm_lap = nx.normalized_laplacian_matrix(G)
-    # e, U = LA.eigh(norm_lap.A)
-    # Ut = U.transpose()
-    #
-    # labels = U[:, 1:2]
-    # x = e
-    # y = np.divide(np.dot(Ut, U[:, 1:2]), np.dot(Ut, features))
-    #
-    # plt.scatter(x, y)
-    # plt.show()
-    # exit()
 
     features = normalize(features)
     adj = normalize(adj + sp.eye(adj.shape[0]))

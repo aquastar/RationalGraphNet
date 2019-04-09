@@ -318,7 +318,10 @@ if __name__ == '__main__':
     parser.add_argument('--epoch', type=int, default=10000)
     args = parser.parse_args()
 
+    #####################
     # gen synthetic data
+    #####################
+
     # opt = 5
     # x = np.linspace(0, 1, 500)
     # y = func(x, opt=opt)
@@ -326,7 +329,9 @@ if __name__ == '__main__':
     # rez = remez_net(args)
     # rez.train(x, y, opt)
 
-    # Load data
+    #####################
+    # Load real world graph
+    #####################
     adj, features, labels, idx_train, idx_val, idx_test = gen_data()
 
     e, U = LA.eigh(adj.A)
@@ -348,9 +353,9 @@ if __name__ == '__main__':
 
     res = y_pred - y[idx_test]
     print("=== Testing in spectral domain")
-    print(res)
+    print(mean(res))
 
     print("=== Testing in vertex domain")
     labels_pred = np.dot(extract_rational_lap(rez.rat, adj), features)
     res = labels_pred - labels
-    print(res)
+    print(mean(res))
