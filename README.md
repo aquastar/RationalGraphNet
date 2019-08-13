@@ -46,7 +46,7 @@ Codes for the paper
 
 # Citation
 ```
-@article{ratgraphnet
+@article{chen2018icdmrationalnet
   author    = {Zhiqian Chen and
                Feng Chen and
                Rongjie Lai and
