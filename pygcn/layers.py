@@ -1,5 +1,3 @@
-import math
-
 import torch
 from torch.nn.modules.module import Module
 from torch.nn.parameter import Parameter

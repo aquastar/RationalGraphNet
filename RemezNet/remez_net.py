@@ -4,6 +4,7 @@ import time
 
 import scipy.interpolate
 import torch.nn.functional as F
+from numpy import linalg as LA
 from pylab import plot, matplotlib, mean, std
 from sklearn.metrics import mean_squared_error
 from torch import optim, nn
