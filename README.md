@@ -1,5 +1,5 @@
-# Rational Neural Networks (RemezNet)
-![remez net](ratnet.png)
+<!--# Rational Neural Networks (RemezNet)
+![remez net](ratnet.png)-->
 
 # Demo of Rational Net in spectral domain
 **func**: the target function to approximate  
