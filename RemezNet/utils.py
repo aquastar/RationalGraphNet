@@ -263,7 +263,7 @@ def rational_lap(lap, c, m, n):
     for i in range(m + 1, n + m + 1):
         q.append(c[i] * (lap ** (i - m)))
 
-    p_m, q_m = sum(p), np.linalg.pinv(np.sum(p).A)
+    p_m, q_m = sum(p), np.linalg.pinv(np.sum(q).A)
 
     return p_m.dot(q_m)
 
